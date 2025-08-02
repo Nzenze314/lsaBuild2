@@ -1,67 +1,38 @@
 import flet as ft
+
+# Import your custom views
 from components.onboarder import OnboardingView
+from pages.profile import ProfileView
+from pages.home import HomeView
+from pages.auth.forgotPass import ForgotPasswordView
+from pages.auth.signUp import SignUpView
+from pages.auth.signIn import SignInView
+from theme.app_theme import get_dark_theme, get_light_theme
 
+# Placeholder components for the special views
+def getCatNameById(cat_id):
+    return f"Category {cat_id}"
 
+def Tasks(page, category_id):
+    return ft.Text(f"Tasks for category {category_id}") 
 
-ROUTES = ["/", "/store", "/favorites", "/home"]
+def create_task_dialog(page, category_id, task_list):
+    return ft.AlertDialog(title=ft.Text(f"Create task for {category_id}"))
 
-def BottomNavigationBar(page: ft.Page):
-    def change_route(e):
-        selected_index = e.control.selected_index
-        new_route = ROUTES[selected_index]
-        page.go(new_route)
+def create_fab2(page, dialog):
+    return ft.FloatingActionButton(icon=ft.Icons.ADD, on_click=lambda _: page.dialog.open(dialog))
 
-    return ft.NavigationBar(
-        selected_index=ROUTES.index(page.route) if page.route in ROUTES else 0,
-        on_change=change_route,
-        bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
-        destinations=[
-            ft.NavigationBarDestination(icon=ft.Icons.HOME, label="Home"),
-            ft.NavigationBarDestination(icon=ft.Icons.STORE, label="Store"),
-            ft.NavigationBarDestination(
-                icon=ft.Icons.BOOKMARK_BORDER,
-                selected_icon=ft.Icons.BOOKMARK,
-                label="Favorites",
-            ),
-            ft.NavigationBarDestination(icon=ft.Icons.INFO, label="Onboarding"),
-        ]
-    )
+def delDilog(category_id):
+    return ft.AlertDialog(title=ft.Text(f"Delete all tasks in category {category_id}?"))
 
-# Base View class
+# Base view class
 class BaseView:
-    def __init__(self, page: ft.Page):
+    def __init__(self, page: ft.Page): 
         self.page = page
 
     def build(self) -> ft.View:
-        raise NotImplementedError("Each view must implement its own build method.")
+        raise NotImplementedError("Each view must implement its own build method.") 
 
-# Home View
-class HomeView(BaseView):
-    def build(self):
-        return ft.View(
-            route="/home",
-            controls=[
-                ft.AppBar(title=ft.Text("Home"), bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST),
-                ft.Text("Welcome to the Home Page!"),
-                ft.ElevatedButton("Go to Store", on_click=lambda _: self.page.go("/store")),
-            ],
-            bottom_appbar=BottomNavigationBar(self.page)
-        )
-
-# Store View
-class StoreView(BaseView):
-    def build(self):
-        return ft.View(
-            route="/store",
-            controls=[
-                ft.AppBar(title=ft.Text("Store"), bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST),
-                ft.Text("This is the Store."),
-                ft.ElevatedButton("Go Back Home", on_click=lambda _: self.page.go("/")),
-            ],
-            bottom_appbar=BottomNavigationBar(self.page)
-        )
-
-# Favorites View
 class FavoritesView(BaseView):
     def build(self):
         return ft.View(
@@ -71,12 +42,10 @@ class FavoritesView(BaseView):
                 ft.Text("Your saved favorites."),
                 ft.ElevatedButton("Go Back Home", on_click=lambda _: self.page.go("/")),
             ],
-             bottom_appbar=BottomNavigationBar(self.page)
         )
 
-# NotFound View
 class NotFoundView(BaseView):
-    def build(self):
+    def build(self):   
         return ft.View(
             route="/404",
             controls=[
@@ -86,52 +55,130 @@ class NotFoundView(BaseView):
             ]
         )
 
-# Router
+# Router with stacked view logic
 class Router:
     def __init__(self, page: ft.Page):
         self.page = page
 
-    def get_view(self, route: str) -> ft.View:
+    def is_authenticated(self):
+        return self.page.session.get("user") is not None
+
+    def get_view_stack(self, route: str) -> list[ft.View]:
         route_map = {
+            "/": OnboardingView,
+            "/signin": SignInView,
+            "/signup": SignUpView,
             "/home": HomeView,
-            # "/store": StoreView,
-            # "/favorites": FavoritesView,
-            "/": OnboardingView
+            "/forgotpassword":ForgotPasswordView,
+            "/profile": ProfileView,
+            "/favorites": FavoritesView, 
+            "/onboarding": OnboardingView,  
         }
-        view_class = route_map.get(route, NotFoundView)
-        return view_class(self.page).build()
+
+        stack = [] 
+        # stack.append(OnboardingView(self.page).build())  # base
+     
+        try:
+            if route == "/signin":           
+                stack.append(SignInView(self.page).build()) 
+                stack.append(route_map[route](self.page).build())
+
+            elif route == "/forgotpassword":
+                stack.append(ForgotPasswordView(self.page).build()) 
+                stack.append(SignInView(self.page).build())
+
+            elif route == "/onboarding":
+                stack.append(OnboardingView(self.page).build()) 
+   
+            elif route == "/home":
+                stack.append(HomeView(self.page).build()) 
+                
+            elif route == "/profile": 
+                stack.append(HomeView(self.page).build())  
+                stack.append(route_map[route](self.page).build())
+
+            elif route in route_map:
+                   
+                stack.append(route_map[route](self.page).build())        
+    
+            else:
+                stack.append(NotFoundView(self.page).build())
+
+        except Exception as e:
+            print(f"The usual pop error: {e}")
+
+        return stack
 
 # Main App
 class MyApp:
     def __init__(self, page: ft.Page):
         self.page = page
         self.router = Router(page)
+        self.view_stack = []
+        self.ai_server = "https://zylla.onrender.com"
+        "Mg8CgSgpU7Ep2Gi"
 
-    def main(self):
-        self.page.title = "Mobile Flet App"
-        self.page.window.width = 350
-        self.page.window.height = 600
-        self.page.window.resizable = False
-        self.page.window.always_on_top = True
-        self.page.on_route_change = self.route_change
-        self.page.on_view_pop = self.view_pop
-        self.page.go(self.page.route)
-
-    def route_change(self, route):
-        
-        self.page.views.clear()
-        view = self.router.get_view(self.page.route)
-        self.page.views.append(view)
+    def toggle_theme_mode(self, e):
+        self.page.theme_mode = (
+            ft.ThemeMode.DARK
+            if self.page.theme_mode == ft.ThemeMode.LIGHT
+            else ft.ThemeMode.LIGHT
+        )
         self.page.update()
 
-    def view_pop(self, view):
-        self.page.views.pop()
-        if self.page.views:
-            self.page.go(self.page.views[-1].route)
+    def main(self):  
+        self.page.title = "LSA App"     
+        self.page.window.width = 350
+        self.page.window.height = 600            
+        self.page.window.resizable = False
+        self.page.window.always_on_top = True
+        self.page.padding = ft.padding.all(0)
+        self.page.theme_mode = ft.ThemeMode.SYSTEM
+        self.page.theme = get_light_theme()
+        self.page.dark_theme = get_dark_theme()
 
+        self.page.on_route_change = self.route_change
+        self.page.on_view_pop = self.view_pop
+
+        self.page.floating_action_button = ft.FloatingActionButton(
+            icon=ft.Icons.DARK_MODE, 
+            on_click=self.toggle_theme_mode  
+        ) 
+
+        self.page.fonts = {
+            "Grand Hotel": "/fonts/GrandHotel-Regular.ttf",
+            "Bungee-Regular": "/fonts/Bungee-Regular.ttf",
+        }   
+        onboardingCompleted = self.page.client_storage.get("onboarding_completed") 
+
+        if onboardingCompleted:     
+            self.page.go("/signin")     
+             
+        self.page.go(self.page.route)    
+
+    def route_change(self, e):
+        print(f"[Route Change] → {e.route}") 
+        self.page.views.clear()    
+        view_stack = self.router.get_view_stack(e.route)
+        self.page.views.extend(view_stack)
+        self.view_stack = view_stack[:]  # Copy stack  
+        print(f"[Route views] → {self.page.views}")          
+        # self.page.client_storage.set("route", self.page.views[1])  # Save current route in session
+        self.page.update()             
+
+    def view_pop(self, view):
+        try:    
+            self.page.views.pop()
+            if self.page.views:
+                top_view = self.page.views[-1] 
+                self.page.go(top_view.route)     
+        except Exception as er:             
+            print(f"The usual pop error! {er}")             
+        self.page.update()
+    
 # Run
 def run(page: ft.Page):
     app = MyApp(page)
     app.main()
 
-ft.app(target=run, view=ft.AppView.FLET_APP,assets_dir="assets")
+ft.app(target=run, view=ft.AppView.FLET_APP, assets_dir="assets")     

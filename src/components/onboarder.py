@@ -8,8 +8,8 @@ class OnboardingView(BaseView):
         # Declare internal onboarding content and images
         self.content = [
            ["Welcome to the LSA app", "Your AI-powered guide for all things Landmark and research"],
-            ["Meet Zylla, Your personal research buddy,", "Powered by cutting-edge AI and cloud technologies"],
-            ["Got a question", "Zylla's got answers! Fast, reliable, and always up-to-date"],
+            ["Powered by cutting-edge AI and cloud technologies","Meet Zylla, Your personal assitant and research buddy"],
+            ["Got a question", "Zylla's got you covered! Fast, reliable, and always up-to-date"],
             ["Now then", "Let's begin"]
         ]
         self.images = [
@@ -20,9 +20,10 @@ class OnboardingView(BaseView):
         ]
         self.total_pages = len(self.content)
         self.index = 0
+        self.font = "Bungee-Regular"
 
         # UI Elements
-        self.title_text = ft.Text(self.content[0][0], size=24, weight=ft.FontWeight.BOLD,text_align=ft.TextAlign.CENTER)
+        self.title_text = ft.Text(self.content[0][0], size=24, font_family=self.font, weight=ft.FontWeight.W_100,text_align=ft.TextAlign.CENTER)
         self.subtitle_text = ft.Text(self.content[0][1], size=16, text_align=ft.TextAlign.CENTER)
         self.image = ft.Image(src=self.images[0], height=300, fit=ft.ImageFit.CONTAIN)
         self.dots = self._build_dots()
@@ -56,7 +57,8 @@ class OnboardingView(BaseView):
             self.index += 1
             self._update_content()
         else:
-            self.page.go("/home")
+            self.page.client_storage.set("onboarding_completed", True)
+            self.page.go("/signin")
 
     def _back(self, _):
         if self.index > 0:
@@ -90,6 +92,7 @@ class OnboardingView(BaseView):
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     spacing=20,
                     expand=True,
+                    scroll=ft.ScrollMode.AUTO,
                 )
             ],
         )
