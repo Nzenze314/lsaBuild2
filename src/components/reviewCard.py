@@ -85,7 +85,7 @@ class LeaveReviewCard(ft.Container):
 
     def submit_review(self, e):
         review_text = self.review_input.value
-        if review_text is "":
+        if not review_text:
             alert = AlertBox("Please enter a review and rating")
             self.page.open(
                  alert
