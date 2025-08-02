@@ -4,8 +4,6 @@ from components.authFunctions import getConvos, supabase, logout
 import datetime
 import requests
 import json
-import uuid
-import httpx
 
 from components.drawer import SideBar
 from components.alert import AlertBox # Import httpx
