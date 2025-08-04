@@ -235,8 +235,7 @@ class HomeView(BaseView):
             title=ft.Text("LSA Chatbot",font_family=self.font,
                           weight=ft.FontWeight.W_100, size=20,color=ft.Colors.with_opacity(0.5,ft.Colors.PRIMARY),
                           style=ft.TextStyle(shadow=ft.BoxShadow(spread_radius=1,
-                                            blur_radius=2,
-                                            color=ft.Colors.GREY_300,
+                                            blur_radius=2,color="white",
                                             offset=ft.Offset(0, 0.4),
                                             blur_style=ft.ShadowBlurStyle.OUTER,
                                             ))

@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize Supabase client
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
+SUPABASE_URL = "https://jxwljzluygmbogwajkgp.supabase.co" 
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4d2xqemx1eWdtYm9nd2Fqa2dwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NjA1OTUsImV4cCI6MjA2OTUzNjU5NX0.1M7baVwaKrsElXfVN2KQaB4y4qlbnLu4KuPvGwgBTaU"
 
 if not SUPABASE_URL or not SUPABASE_ANON_KEY:
     raise ValueError("Supabase URL and Anon Key must be set in .env file")
@@ -32,7 +32,7 @@ def getConvos(userId):
         print(er)
         return []
     
-def createNewChat(page,data):
+def createNewChat(page,data) -> str|None:
     response = supabase.table('conversations').insert(data).execute()  # Create a new conversation with user..........
     if response.data:
         

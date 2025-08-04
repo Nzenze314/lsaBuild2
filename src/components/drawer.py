@@ -22,8 +22,9 @@ class SideBar(ft.NavigationDrawer):
             data = {
                 "sender": str(self.user_id)
             }
+            print("Starting a new chat")
             conviId = createNewChat(self.page,data)
-            self.on_convo_selected(conviId)
+            self.select_conversation(conviId)
             self.update_convos(e)
             self.page.close(self)
             self.page.update()
@@ -61,6 +62,7 @@ class SideBar(ft.NavigationDrawer):
             self.user_id = user_data.get("id")
             self.user_email = user_data.get("email")
         convos = getConvos( self.user_id)
+        
 
         # print(convos)
         if len(convos) > 0:

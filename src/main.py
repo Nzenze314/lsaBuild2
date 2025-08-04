@@ -12,7 +12,7 @@ from theme.app_theme import get_dark_theme, get_light_theme
 # Placeholder components for the special views
 def getCatNameById(cat_id):
     return f"Category {cat_id}"
-
+ 
 def Tasks(page, category_id):
     return ft.Text(f"Tasks for category {category_id}") 
 
