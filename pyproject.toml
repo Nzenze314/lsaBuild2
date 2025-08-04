@@ -9,7 +9,7 @@ authors = [
 ]
 dependencies = [
   "flet==0.28.3",
-  "supabase","pydantic==2.10.4",
+  "supabase",
   "python-dotenv"
 ]
 
