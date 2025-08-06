@@ -10,7 +10,7 @@ class ProfileView(BaseView):
         uuid = self.page.session.get("userId")
         self.profileData = self.page.session.get("userProfile")
         
-    def build(self):
+    def build(self): 
         appbar = ft.AppBar(
             title=ft.Text("Profile", size=20, weight=ft.FontWeight.BOLD),
 

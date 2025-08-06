@@ -65,8 +65,8 @@ class SignInView(BaseView):
                 ft.Stack(
                     [
                         ft.Image(
-                            fit=ft.ImageFit.COVER,
                             width=self.page.window.width,
+                            fit=ft.ImageFit.COVER,
                             src="/images/bgSup2.jpg",
                             expand=1,
                         ),

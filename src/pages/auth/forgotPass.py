@@ -18,7 +18,7 @@ class ForgotPasswordView(BaseView):
                 ft.Column(
                     [
                         ft.Text("Password Reset", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.PRIMARY),
-                        ft.Text("Check your email for the password reset link.", size=14, color=ft.Colors.WHITE, ref=self.message_text_ref),
+                        ft.Text("Check your email for the password reset link.", size=14, color=ft.Colors.RED, ref=self.message_text_ref),
                         ft.ElevatedButton("Dismiss", on_click=lambda _: self.page.close(self.bs)),
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -57,7 +57,7 @@ class ForgotPasswordView(BaseView):
                                             ft.Text("Forgot Password", size=22, weight=ft.FontWeight.BOLD, color=ft.Colors.PRIMARY),
                                             ft.Text("Enter your email to reset password", size=14, color=ft.Colors.WHITE),
                                             self.email_field,
-                                            ft.ElevatedButton("Send Reset Link", width=300, on_click=self.handle_reset_password),
+                                            ft.ElevatedButton(" Reset Password", width=300, on_click=self.handle_reset_password),
                                             self.loading_indicator,
                                             ft.TextButton("Back to Sign In", on_click=lambda _: self.page.go("/signin"))
                                         ]
@@ -87,7 +87,7 @@ class ForgotPasswordView(BaseView):
         self.loading_indicator.visible = True
         self.page.update()
 
-        success, error = reset_password(email)
+        success = reset_password(email)
 
         self.loading_indicator.visible = False
         self.page.update()
@@ -95,7 +95,7 @@ class ForgotPasswordView(BaseView):
         if success:
             self.message_text_ref.current.value = "Password reset link sent to your email."
         else:
-            self.message_text_ref.current.value = f"Password reset failed: {error}"
+            self.message_text_ref.current.value = f"Password reset failed"
         
         self.bs.open = True
         self.page.update()

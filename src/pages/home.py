@@ -17,7 +17,7 @@ class HomeView(BaseView):
         self.font = "Bungee-Regular"
         self.font2 = "Grand Hotel"
         self.defultFont = "Roboto"
-        self.current_conversation_id = self.get_or_create_conversation
+        self.current_conversation_id = self.get_or_create_conversation 
         self.user_id = self.page.session.get("userId")
         self.user_email = self.page.session.get("email")
         self.alert_box = AlertBox(page)

@@ -14,13 +14,13 @@ def getCatNameById(cat_id):
     return f"Category {cat_id}"
  
 def Tasks(page, category_id):
-    return ft.Text(f"Tasks for category {category_id}") 
+    return ft.Text(f"Tasks for category {category_id}")      
 
 def create_task_dialog(page, category_id, task_list):
     return ft.AlertDialog(title=ft.Text(f"Create task for {category_id}"))
 
 def create_fab2(page, dialog):
-    return ft.FloatingActionButton(icon=ft.Icons.ADD, on_click=lambda _: page.dialog.open(dialog))
+    return ft.FloatingActionButton(icon=ft.Icons.ADD, on_click=lambda _: page.dialog.open(dialog)) 
 
 def delDilog(category_id):
     return ft.AlertDialog(title=ft.Text(f"Delete all tasks in category {category_id}?"))
@@ -51,10 +51,10 @@ class NotFoundView(BaseView):
             controls=[
                 ft.AppBar(title=ft.Text("Not Found"), bgcolor=ft.Colors.ERROR),
                 ft.Text("Oops! Page not found."),
-                ft.ElevatedButton("Go Home", on_click=lambda _: self.page.go("/")),
+                ft.ElevatedButton("Go Home", on_click=lambda _: self.page.go("/")), 
             ]
-        )
-
+        ) 
+ 
 # Router with stacked view logic
 class Router:
     def __init__(self, page: ft.Page):
@@ -83,14 +83,14 @@ class Router:
                 stack.append(SignInView(self.page).build()) 
                 stack.append(route_map[route](self.page).build())
 
-            elif route == "/forgotpassword":
+            elif route == "/forgotpassword":   
                 stack.append(ForgotPasswordView(self.page).build()) 
-                stack.append(SignInView(self.page).build())
+                stack.append(SignInView(self.page).build())   
 
             elif route == "/onboarding":
-                stack.append(OnboardingView(self.page).build()) 
+                stack.append(OnboardingView(self.page).build())  
    
-            elif route == "/home":
+            elif route == "/home": 
                 stack.append(HomeView(self.page).build()) 
                 
             elif route == "/profile": 

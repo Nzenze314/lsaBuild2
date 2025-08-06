@@ -4,7 +4,7 @@ from dateutil import parser
 import flet as ft
 import pytz
 
-from components.authFunctions import createNewChat, deleteChat, getConvos
+from components.authFunctions import createNewChat, deleteChat, getConvos, logout
 
 class SideBar(ft.NavigationDrawer):
 
@@ -31,11 +31,6 @@ class SideBar(ft.NavigationDrawer):
         except Exception as er:
             return
         
-    def sign_out(self):
-        print('Signing out..')
-        self.page.session.clear()
-        self.page.go('/')
-        self.page.close(self)
 
     def deleteConvo(self,e):
         print("Deleting conversation...")
@@ -158,10 +153,14 @@ class SideBar(ft.NavigationDrawer):
             ft.ListTile(
                 leading=ft.Icon(ft.Icons.LOGOUT, color=ft.Colors.WHITE),
                 title=ft.Text("Sign-out", color=ft.Colors.WHITE),
-                on_click=lambda e: self.sign_out,
+                on_click=self.logout,
             ),
             ft.Container(height=12)
         ]
+
+    def logout(self, e):
+        logout(self,e)
+        self.page.update()
 
     def update_convos(self,e):
         try:
