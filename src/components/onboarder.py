@@ -25,7 +25,7 @@ class OnboardingView(BaseView):
         # UI Elements
         self.title_text = ft.Text(self.content[0][0], size=24, font_family=self.font, weight=ft.FontWeight.W_100,text_align=ft.TextAlign.CENTER)
         self.subtitle_text = ft.Text(self.content[0][1], size=16, text_align=ft.TextAlign.CENTER)
-        self.image = ft.Image(src=self.images[0], height=300, fit=ft.ImageFit.CONTAIN)
+        self.image = ft.Image(src=self.images[0], expand=6, fit=ft.ImageFit.COVER)
         self.dots = self._build_dots()
 
     def _build_dots(self):
@@ -73,26 +73,26 @@ class OnboardingView(BaseView):
         return ft.View(
             route="/onboarding",
             controls=[
-                ft.Column(
-                    [
-                        self.title_text,
-                        self.image,
-                        self.subtitle_text,
-                        self.dots,
-                        ft.Row(
-                            [
-                                ft.TextButton("Back", on_click=self._back),
-                                ft.TextButton("Skip", on_click=self._skip),
-                                ft.FilledButton("Next", on_click=self._next),
-                            ],
-                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                        ),
-                    ],
-                    alignment=ft.MainAxisAlignment.SPACE_EVENLY, 
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=20,
-                    expand=True,
-                    scroll=ft.ScrollMode.AUTO,
+                ft.Container(
+                    content=ft.Column(
+                        [
+                            self.title_text,
+                            self.image,
+                            self.subtitle_text,
+                            self.dots,
+                            ft.Row(
+                                [
+                                    ft.TextButton("Back", on_click=self._back),
+                                    ft.TextButton("Skip", on_click=self._skip),
+                                    ft.FilledButton("Next", on_click=self._next),
+                                ],
+                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                            ),
+                        ],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN, 
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        expand=True
+                    ),expand=True
                 )
-            ],
+            ],vertical_alignment=ft.MainAxisAlignment.SPACE_EVENLY
         )

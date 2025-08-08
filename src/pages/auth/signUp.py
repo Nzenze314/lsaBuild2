@@ -77,6 +77,7 @@ class SignUpView(BaseView):
                                     blur=18,
                                     content=ft.Column(
                                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                        alignment=ft.MainAxisAlignment.SPACE_EVENLY,
                                         spacing=5,
                                         controls=[
                                             ft.Text("Create Account", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.PRIMARY),
@@ -86,7 +87,7 @@ class SignUpView(BaseView):
                                             ft.ElevatedButton("Sign Up", on_click=self.handle_sign_up, width=300 ,),
                                             self.loading_indicator,
                                             ft.Divider(),
-                                            ft.TextButton("Already have an account? Sign In", on_click=lambda _: self.page.go("/signin"))
+                                            ft.TextButton("Already have an account? Sign In", on_click=self.goback)
                                         ]
                                     )
                                 )
@@ -97,12 +98,18 @@ class SignUpView(BaseView):
                 )
             ],padding=0
         )
+    
+    def goback(self,e):
+        print('function trigered')
+        self.page.go('/signin')
+        self.page.update()
 
     def bs_dismissed(self):
         self.bs.open = False
         self.page.update()
 
     def handle_sign_up(self, e):
+        print('signin function trigered')
         name = self.name_field.value
         email = self.email_field.value
         password = self.password_field.value

@@ -7,7 +7,7 @@ class SignInView(BaseView):
     def __init__(self, page):
         super().__init__(page)
         self.error_message_text_ref = ft.Ref[ft.Text]()
-        self.signInBtn = ft.ElevatedButton("Sign In", on_click=self.handle_sign_in, width=300)
+        self.signInBtn = ft.ElevatedButton("Sign In", on_click=self.handle_sign_in, width=300,height=40)
         # if credentials exist in session, pre-fill the email and password fields
         
 
@@ -101,7 +101,8 @@ class SignInView(BaseView):
                                                 self.loading_indicator,
                                                 ft.Divider(),
                                                 ft.TextButton("Don't have an account? Sign Up", on_click=lambda _: self.page.go("/signup"))
-                                            ]
+                                            ],expand=True,
+                                            alignment=ft.MainAxisAlignment.SPACE_EVENLY,
                                         )
                                     )
                                 ],

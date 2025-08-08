@@ -69,10 +69,10 @@ class Router:
             "/signin": SignInView,
             "/signup": SignUpView,
             "/home": HomeView,
-            "/forgotpassword":ForgotPasswordView,
-            "/profile": ProfileView,
+            "/forgotpassword":ForgotPasswordView, 
+            "/profile": ProfileView,                
             "/favorites": FavoritesView, 
-            "/onboarding": OnboardingView,  
+            "/onboarding": OnboardingView,     
         }
 
         stack = [] 
@@ -83,6 +83,12 @@ class Router:
                 stack.append(SignInView(self.page).build()) 
                 stack.append(route_map[route](self.page).build())
 
+            elif route == "/signup":     
+                stack.append(SignUpView(self.page).build())  
+                stack.append(SignInView(self.page).build())  # view to display when poped   
+                  # Current view
+                # stack.append(SignInView(self.page).build())  # view to be poped
+
             elif route == "/forgotpassword":   
                 stack.append(ForgotPasswordView(self.page).build()) 
                 stack.append(SignInView(self.page).build())   
@@ -91,13 +97,13 @@ class Router:
                 stack.append(OnboardingView(self.page).build())  
    
             elif route == "/home": 
-                stack.append(HomeView(self.page).build()) 
+                stack.append(HomeView(self.page).build())   
                 
             elif route == "/profile": 
                 stack.append(HomeView(self.page).build())  
                 stack.append(route_map[route](self.page).build())
 
-            elif route in route_map:
+            elif route in route_map:    
                    
                 stack.append(route_map[route](self.page).build())        
     
@@ -113,6 +119,7 @@ class Router:
 class MyApp:
     def __init__(self, page: ft.Page):
         self.page = page
+        self.page.theme_mode = ft.ThemeMode.LIGHT
         self.router = Router(page)
         self.view_stack = []
         self.ai_server = "https://zylla.onrender.com"
@@ -127,18 +134,15 @@ class MyApp:
         self.page.update()
 
     def main(self):  
-        self.page.title = "LSA App"     
-        self.page.window.width = 350
-        self.page.window.height = 600            
-        self.page.window.resizable = False
+        self.page.title = "LSA App"            
         self.page.window.always_on_top = True
         self.page.padding = ft.padding.all(0)
-        self.page.theme_mode = ft.ThemeMode.SYSTEM
+        self.page.theme_mode = ft.ThemeMode.LIGHT
         self.page.theme = get_light_theme()
         self.page.dark_theme = get_dark_theme()
 
-        self.page.on_route_change = self.route_change
-        self.page.on_view_pop = self.view_pop
+        self.page.on_route_change = self.route_change 
+        self.page.on_view_pop = self.view_pop 
 
         self.page.floating_action_button = ft.FloatingActionButton(
             icon=ft.Icons.DARK_MODE, 
@@ -152,13 +156,14 @@ class MyApp:
         onboardingCompleted = self.page.client_storage.get("onboarding_completed") 
 
         if onboardingCompleted:     
-            self.page.go("/signin")     
+            # self.page.go("/signin")  
+            pass   
              
         self.page.go(self.page.route)    
 
-    def route_change(self, e):
-        print(f"[Route Change] → {e.route}") 
-        self.page.views.clear()    
+    def route_change(self, e):    
+        print(f"[Route Change] → {e.route}")   
+        self.page.views.clear()       
         view_stack = self.router.get_view_stack(e.route)
         self.page.views.extend(view_stack)
         self.view_stack = view_stack[:]  # Copy stack  
@@ -167,7 +172,8 @@ class MyApp:
         self.page.update()             
 
     def view_pop(self, view):
-        try:    
+        print('Poping...') 
+        try:      
             self.page.views.pop()
             if self.page.views:
                 top_view = self.page.views[-1] 
