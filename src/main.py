@@ -1,5 +1,13 @@
 import flet as ft
 
+# Base view class
+class BaseView:
+    def __init__(self, page: ft.Page): 
+        self.page = page
+
+    def build(self) -> ft.View:
+        raise NotImplementedError("Each view must implement its own build method.") 
+
 # Import your custom views
 from components.onboarder import OnboardingView
 from pages.profile import ProfileView
@@ -7,6 +15,7 @@ from pages.home import HomeView
 from pages.auth.forgotPass import ForgotPasswordView
 from pages.auth.signUp import SignUpView
 from pages.auth.signIn import SignInView
+from pages.about import AboutView # Import AboutView
 from theme.app_theme import get_dark_theme, get_light_theme
 
 # Placeholder components for the special views
@@ -24,14 +33,6 @@ def create_fab2(page, dialog):
 
 def delDilog(category_id):
     return ft.AlertDialog(title=ft.Text(f"Delete all tasks in category {category_id}?"))
-
-# Base view class
-class BaseView:
-    def __init__(self, page: ft.Page): 
-        self.page = page
-
-    def build(self) -> ft.View:
-        raise NotImplementedError("Each view must implement its own build method.") 
 
 class FavoritesView(BaseView):
     def build(self):
@@ -70,38 +71,41 @@ class Router:
             "/signup": SignUpView,
             "/home": HomeView,
             "/forgotpassword":ForgotPasswordView, 
-            "/profile": ProfileView,                
+            "/profile": ProfileView,                  
             "/favorites": FavoritesView, 
-            "/onboarding": OnboardingView,     
+            "/onboarding": OnboardingView,
+            "/about": AboutView, # Add about route
         }
 
         stack = [] 
-        # stack.append(OnboardingView(self.page).build())  # base
+        # stack.append(OnboardingView(self.page).build())  # base               
      
         try:
             if route == "/signin":           
-                stack.append(SignInView(self.page).build()) 
-                stack.append(route_map[route](self.page).build())
-
+                stack.append(SignInView(self.page).build())        
+ 
             elif route == "/signup":     
-                stack.append(SignUpView(self.page).build())  
-                stack.append(SignInView(self.page).build())  # view to display when poped   
+                stack.append(SignUpView(self.page).build()) # view to display when poped       
                   # Current view
                 # stack.append(SignInView(self.page).build())  # view to be poped
 
-            elif route == "/forgotpassword":   
+            elif route == "/forgotpassword":                
                 stack.append(ForgotPasswordView(self.page).build()) 
-                stack.append(SignInView(self.page).build())   
 
-            elif route == "/onboarding":
+            elif route == "/onboarding": 
                 stack.append(OnboardingView(self.page).build())  
    
             elif route == "/home": 
                 stack.append(HomeView(self.page).build())   
                 
             elif route == "/profile": 
-                stack.append(HomeView(self.page).build())  
-                stack.append(route_map[route](self.page).build())
+                stack.append(HomeView(self.page).build()) 
+                stack.append(ProfileView(self.page).build())  
+                
+            elif route == "/about":
+                stack.append(HomeView(self.page).build())
+                stack.append(ProfileView(self.page).build())
+                stack.append(AboutView(self.page).build())
 
             elif route in route_map:    
                    
@@ -148,7 +152,7 @@ class MyApp:
             icon=ft.Icons.DARK_MODE, 
             on_click=self.toggle_theme_mode  
         ) 
-
+    
         self.page.fonts = {
             "Grand Hotel": "/fonts/GrandHotel-Regular.ttf",
             "Bungee-Regular": "/fonts/Bungee-Regular.ttf",
@@ -156,10 +160,9 @@ class MyApp:
         onboardingCompleted = self.page.client_storage.get("onboarding_completed") 
 
         if onboardingCompleted:     
-            # self.page.go("/signin")  
-            pass   
+            self.page.go("/signin")   
              
-        self.page.go(self.page.route)    
+        self.page.go(self.page.route or "/") # Provide a default route if self.page.route is None
 
     def route_change(self, e):    
         print(f"[Route Change] → {e.route}")   
@@ -187,4 +190,4 @@ def run(page: ft.Page):
     app = MyApp(page)
     app.main()
 
-ft.app(target=run, view=ft.AppView.FLET_APP, assets_dir="assets")     
+ft.app(target=run, view=ft.AppView.FLET_APP, assets_dir="assets")

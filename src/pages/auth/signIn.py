@@ -51,7 +51,7 @@ class SignInView(BaseView):
                 padding=20,
             ),
             open=False,
-            on_dismiss=self.bs_dismissed,
+            on_dismiss=self.bs_dismissed,  # type: ignore
         )
         self.page.overlay.append(self.bs)
 
@@ -62,56 +62,59 @@ class SignInView(BaseView):
         return ft.View(
             route="/signin",
             controls=[
-                ft.Stack(
-                    [
-                        ft.Image(
-                            width=self.page.window.width,
-                            fit=ft.ImageFit.COVER,
-                            src="/images/bgSup2.jpg",
-                            expand=1,
-                        ),
-                        ft.Container(
-                            expand=True,
-                            content=ft.Column(
-                                controls=[
-                                    ft.Container(
-                                        content=ft.Image(src="/images/botHello.png", fit=ft.ImageFit.CONTAIN),
-                                        expand=2,
-                                        alignment=ft.alignment.center,
-                                    ),
-                                    ft.Container(
-                                        expand=5,
-                                        padding=ft.padding.symmetric(horizontal=19, vertical=20),
-                                        border_radius=ft.border_radius.only(top_left=30, top_right=30),
-                                        bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.PURPLE_800),
-                                        blur=12,
-                                        content=ft.Column(
-                                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                            spacing=10,
-                                            controls=[
-                                                ft.Text("Welcome Back", size=24, weight=ft.FontWeight.BOLD,color=ft.Colors.PRIMARY),
-                                                ft.Text("Sign in to continue chating", size=14, color=ft.Colors.WHITE),
-                                                self.email_field,
-                                                self.password_field,
-                                                ft.Row(
-                                                    [ft.TextButton("Forgot Password?",style=ft.ButtonStyle(color=ft.Colors.WHITE), on_click=lambda _: self.page.go("/forgotpassword"))],
-                                                    alignment=ft.MainAxisAlignment.END
-                                                ),
-                                                 self.signInBtn,
-                                                self.loading_indicator,
-                                                ft.Divider(),
-                                                ft.TextButton("Don't have an account? Sign Up", on_click=lambda _: self.page.go("/signup"))
-                                            ],expand=True,
-                                            alignment=ft.MainAxisAlignment.SPACE_EVENLY,
-                                        )
-                                    )
-                                ],
+                ft.SafeArea(
+                    content = ft.Stack(
+                        [
+                            ft.Image(
+                                width=self.page.window.width,
+                                height= self.page.window.height,
+                                fit=ft.ImageFit.COVER,
+                                src="/images/bgSup2.jpg",
+                                expand=1
+                            ),
+                            ft.Container(
                                 expand=True,
-                                alignment=ft.MainAxisAlignment.SPACE_EVENLY,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Container(
+                                            content=ft.Image(src="/images/botHello.png", fit=ft.ImageFit.CONTAIN),
+                                            expand=2,
+                                            alignment=ft.alignment.center,
+                                        ),
+                                        ft.Container(
+                                            expand=5,
+                                            padding=ft.padding.symmetric(horizontal=19, vertical=20),
+                                            border_radius=ft.border_radius.only(top_left=30, top_right=30),
+                                            bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.PURPLE_800),
+                                            blur=12,
+                                            content=ft.Column(
+                                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                                spacing=10,
+                                                controls=[
+                                                    ft.Text("Welcome Back", size=30, weight=ft.FontWeight.BOLD,color=ft.Colors.PRIMARY),
+                                                    ft.Text("Sign in to continue chating", size=20, color=ft.Colors.WHITE),
+                                                    self.email_field,
+                                                    self.password_field,
+                                                    ft.Row(
+                                                        [ft.TextButton("Forgot Password?",style=ft.ButtonStyle(color=ft.Colors.WHITE), on_click=lambda _: self.page.go("/forgotpassword"))],
+                                                        alignment=ft.MainAxisAlignment.END
+                                                    ),
+                                                    self.signInBtn,
+                                                    self.loading_indicator,
+                                                    ft.Divider(),
+                                                    ft.TextButton("Don't have an account? Sign Up", on_click=lambda _: self.page.go("/signup"))
+                                                ],expand=True,scroll=ft.ScrollMode.AUTO,
+                                                alignment=ft.MainAxisAlignment.SPACE_EVENLY,
+                                            )
+                                        )
+                                    ],
+                                    expand=True,
+                                    alignment=ft.MainAxisAlignment.SPACE_EVENLY,
+                                )
                             )
-                        )
-                    ],expand=True
-                ),
+                        ],expand=True
+                    ),expand=True
+                )
             ],padding=0
         )
     
@@ -120,6 +123,7 @@ class SignInView(BaseView):
         self.bs.open = False
         
         self.page.update()
+    
 
     def handle_sign_in(self, e):
         self.signInBtn.disabled = True

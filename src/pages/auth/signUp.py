@@ -47,7 +47,7 @@ class SignUpView(BaseView):
                 padding=20,
             ),
             open=False,
-            on_dismiss=self.bs_dismissed,
+            on_dismiss=self.bs_dismissed, # type: ignore
         )
         self.page.overlay.append(self.bs)
 
@@ -56,45 +56,48 @@ class SignUpView(BaseView):
         return ft.View(
             route="/signup",
             controls=[
-                ft.Stack([
-                    ft.Image(src="/images/bgSup2.jpg", fit=ft.ImageFit.COVER, expand=True, width=self.page.window.width,),
-                    ft.Container(
-                        expand=True,
-                        content=ft.Column(
+                ft.SafeArea(
+                    content=ft.Stack(
+                        [
+                        ft.Image(src="/images/bgSup2.jpg", fit=ft.ImageFit.COVER, expand=2, width=self.page.window.width,),
+                        ft.Container(
                             expand=True,
-                            alignment=ft.MainAxisAlignment.SPACE_EVENLY,
-                            controls=[
-                                ft.Container(
-                                    
-                                    content=ft.Image(src="/images/botHello.png", fit=ft.ImageFit.CONTAIN),
-                                    alignment=ft.alignment.center,expand=2
-                                ),
-                                ft.Container(
-                                    expand=8,
-                                    padding=ft.padding.symmetric(horizontal=19, vertical=20),
-                                    border_radius=ft.border_radius.only(top_left=30, top_right=30),
-                                    bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.PURPLE_800),
-                                    blur=18,
-                                    content=ft.Column(
-                                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                        alignment=ft.MainAxisAlignment.SPACE_EVENLY,
-                                        spacing=5,
-                                        controls=[
-                                            ft.Text("Create Account", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.PRIMARY),
-                                            ft.Text("Fill in your details", size=14, color=ft.Colors.WHITE),
-                                            self.name_field,self.email_field, self.password_field, self.confirm_password_field,
-                                            ft.Container(height=10),
-                                            ft.ElevatedButton("Sign Up", on_click=self.handle_sign_up, width=300 ,),
-                                            self.loading_indicator,
-                                            ft.Divider(),
-                                            ft.TextButton("Already have an account? Sign In", on_click=self.goback)
-                                        ]
+                            content=ft.Column(
+                                expand=True,
+                                alignment=ft.MainAxisAlignment.SPACE_EVENLY,
+                                controls=[
+                                    ft.Container(
+                                        
+                                        content=ft.Image(src="/images/botHello.png", fit=ft.ImageFit.CONTAIN),
+                                        alignment=ft.alignment.center,expand=2
+                                    ),
+                                    ft.Container(
+                                        expand=8,
+                                        padding=ft.padding.symmetric(horizontal=19, vertical=20),
+                                        border_radius=ft.border_radius.only(top_left=30, top_right=30),
+                                        bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.PURPLE_800),
+                                        blur=18,
+                                        content=ft.Column(
+                                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                            alignment=ft.MainAxisAlignment.SPACE_EVENLY,
+                                            spacing=5,
+                                            controls=[
+                                                ft.Text("Create Account", size=28, weight=ft.FontWeight.BOLD, color=ft.Colors.PRIMARY),
+                                                ft.Text("Fill in your details", size=19, color=ft.Colors.WHITE),
+                                                self.name_field,self.email_field, self.password_field, self.confirm_password_field,
+                                                ft.Container(height=10),
+                                                ft.ElevatedButton("Sign Up", on_click=self.handle_sign_up, width=300 ,),
+                                                self.loading_indicator,
+                                                ft.Divider(),
+                                                ft.TextButton("Already have an account? Sign In", on_click=self.goback)
+                                            ],scroll=ft.ScrollMode.AUTO
+                                        )
                                     )
-                                )
-                            ]
+                                ]
+                            )
                         )
-                    )
-                ],expand=True
+                    ],expand=True
+                    ),expand=True
                 )
             ],padding=0
         )

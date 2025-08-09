@@ -1,6 +1,6 @@
 import flet as ft
 from supabase import create_client, Client
-from supabase.lib.client_options import ClientOptions
+from supabase.lib.client_options import SyncClientOptions # Changed ClientOptions to SyncClientOptions
 import smtplib
 from email.message import EmailMessage
 import secrets
@@ -24,7 +24,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 supabase2 = create_client(
     SUPABASE_URL,
     SERVICE_ROLE_KEY,
-    options=ClientOptions(
+    options=SyncClientOptions( # Changed ClientOptions to SyncClientOptions
         auto_refresh_token=False,
         persist_session=False,
     )
@@ -53,12 +53,11 @@ def getConvos(userId):
 def createNewChat(page,data) -> str|None:
     response = supabase.table('conversations').insert(data).execute()  # Create a new conversation with user..........
     if response.data:
-        
         page.session.set("current_conversation_id",response.data[0]['id'])   # save new convo in session..............
-        print("New conversation created:", page.current_conversation_id)
-        return page.current_conversation_id
+        print("New conversation created:", response.data[0]['id'])
+        return response.data[0]['id']
     else:
-        print("Error creating conversation:", response.error)
+        print("Error creating conversation:", response.error) # type: ignore
         return None
     
 def deleteChat(chatId):
@@ -88,10 +87,13 @@ def sign_up(email, password,name):
     try:
         res = supabase.auth.sign_up({"email":email, "password":password})
         # Create user profile in the database
-        createUser = supabase.table('profiles').insert({"id": res.user.id,"username":name, "email": email}).execute()
-        if not createUser.data:
-            raise Exception("Failed to create user profile in database")
-        return res.user, None
+        if res.user: # Check if res.user is not None
+            createUser = supabase.table('profiles').insert({"id": res.user.id,"username":name, "email": email}).execute()
+            if not createUser.data:
+                raise Exception("Failed to create user profile in database")
+            return res.user, None
+        else:
+            return None, "User creation failed during sign up."
     except Exception as e:
         return None, str(e)
 

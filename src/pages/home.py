@@ -6,7 +6,8 @@ import requests
 import json
 
 from components.drawer import SideBar
-from components.alert import AlertBox # Import httpx
+from components.alert import AlertBox
+from components.typewriter_text import TypewriterText # Import TypewriterText
 
 class HomeView(BaseView):
     def __init__(self, page):
@@ -17,12 +18,12 @@ class HomeView(BaseView):
         self.font = "Bungee-Regular"
         self.font2 = "Grand Hotel"
         self.defultFont = "Roboto"
-        self.current_conversation_id = self.get_or_create_conversation 
+        self.current_conversation_id = None # Initialize to None, will be set when first message is sent
         self.user_id = self.page.session.get("userId")
         self.user_email = self.page.session.get("email")
         self.alert_box = AlertBox(page)
 
-        self.drawer = SideBar(self.page, self.handle_conversation_change)
+        self.drawer = SideBar(self.page, self.handle_conversation_change,self.handle_convo_deleted)
 
     def handle_logout(self, e):
         logout(self, e)
@@ -34,60 +35,59 @@ class HomeView(BaseView):
                     border_radius=20,width=40,height=40
                 )
 
-    def messageBubble(self, text,is_user=False, img_src=None,is_header=True):
-        """Creates a message bubble with optional image and avatar."""
+    def messageBubble(self, text, is_user=False, img_src=None, is_header=True, apply_typewriter: bool = False):
+        """Creates a message bubble with optional image and avatar, with optional typewriter effect."""
         try:
             currentTime = datetime.datetime.now().strftime("%H:%M")
-            avatar =self.user_avatar()
-            ai_respond = ft.Markdown(
-                value=text,
-                extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
-                on_tap_link=lambda e: print(f"Link tapped: {e.data}")
-            )
-            defultMessage = ft.Text(text, size=16, font_family=self.font if is_header else "", 
-                color=ft.Colors.with_opacity(0.7,ft.Colors.PRIMARY_CONTAINER) if is_header else ft.Colors.BLACK ,text_align=ft.TextAlign.CENTER if is_header else ft.TextAlign.START,
-                    style=ft.TextStyle(shadow=ft.BoxShadow(spread_radius=1,
-                        blur_radius=6,
-                        color=ft.Colors.WHITE,
-                        offset=ft.Offset(0, 0),
-                        blur_style=ft.ShadowBlurStyle.OUTER,
-                        ))
-                    )
+            
             if not is_user:
-                img = ft.Image(src = "images/botHello.png",height=120,fit=ft.ImageFit.COVER) if is_header else ft.Text(height=0)
+                # Logic for bot messages
+                img_control = ft.Image(src="images/botHello.png", height=120, fit=ft.ImageFit.COVER) if is_header else ft.Text(height=0)
+                
+                text_control = None
+                if is_header:
+                    text_control = ft.Text(text, size=16, font_family=self.font, 
+                                           color=ft.Colors.with_opacity(0.7,ft.Colors.PRIMARY_CONTAINER),
+                                           text_align=ft.TextAlign.CENTER,
+                                           style=ft.TextStyle(shadow=ft.BoxShadow(spread_radius=1,
+                                                               blur_radius=6, color=ft.Colors.WHITE,
+                                                               offset=ft.Offset(0, 0), blur_style=ft.ShadowBlurStyle.OUTER)))
+                else:
+                    text_control = ft.Markdown(value=text, extension_set=ft.MarkdownExtensionSet.GITHUB_WEB, on_tap_link=lambda e: print(f"Link tapped: {e.data}"))
 
                 return ft.Container(
                     content=ft.Column(
                         [   
-                            img,
-                            defultMessage if is_header else ai_respond
+                            img_control,
+                            text_control
                         ],alignment=ft.MainAxisAlignment.CENTER,horizontal_alignment=ft.CrossAxisAlignment.CENTER if is_header else ft.CrossAxisAlignment.START
                     ),alignment=ft.alignment.center if is_header else ft.alignment.top_left
                 )
             else:
+                # Logic for user messages
                 return ft.Container(
-                content=ft.Row(
-                    [
-                        ft.Container(
-                            ft.Column(
-                                [
-                                    ft.Text(text, size=15, color=ft.Colors.GREY_800,expand=7,text_align=ft.TextAlign.RIGHT,),
-                                    ft.Text(currentTime, size=7, color=ft.Colors.GREY_500,expand=1) # TODO: Replace with actual timestamp
-                                ],horizontal_alignment=ft.CrossAxisAlignment.END,
-                            ),alignment=ft.alignment.bottom_right,bgcolor=ft.Colors.ON_SECONDARY_CONTAINER,
-                            border_radius=ft.border_radius.only(top_left=20,top_right=10,bottom_left=20,bottom_right=0),
-                            padding=ft.padding.all(5),width=len(text) * 8 + 20, # This width calculation might need adjustment
-                        )
-                    ],vertical_alignment=ft.CrossAxisAlignment.END,alignment=ft.MainAxisAlignment.END,wrap=True
-                ),
-                padding=ft.padding.all(5),
-                alignment=ft.alignment.bottom_right if is_user else ft.alignment.bottom_left,
-            
-            )
+                    content=ft.Row(
+                        [
+                            ft.Container(
+                                ft.Column(
+                                    [
+                                        ft.Text(text, size=15, color=ft.Colors.GREY_800,expand=7,text_align=ft.TextAlign.RIGHT,),
+                                        ft.Text(currentTime, size=7, color=ft.Colors.GREY_500,expand=1)
+                                    ],horizontal_alignment=ft.CrossAxisAlignment.END,
+                                ),alignment=ft.alignment.bottom_right,bgcolor=ft.Colors.ON_SECONDARY_CONTAINER,
+                                border_radius=ft.border_radius.only(top_left=20,top_right=10,bottom_left=20,bottom_right=0),
+                                padding=ft.padding.all(5),width=len(text) * 8 + 20,
+                            )
+                        ],vertical_alignment=ft.CrossAxisAlignment.END,alignment=ft.MainAxisAlignment.END,wrap=True
+                    ),
+                    padding=ft.padding.all(5),
+                    alignment=ft.alignment.bottom_right if is_user else ft.alignment.bottom_left,
+                )
         except Exception as er:
             print(f'{er}')
+            return ft.Container() # Return a dummy container to avoid None
 
-    def handle_conversation_change(self, convo_id):
+    def handle_conversation_change(self, convo_id): 
         try:
             self.current_conversation_id = convo_id
             self.page.session.set("current_conversation_id", convo_id)
@@ -101,8 +101,10 @@ class HomeView(BaseView):
         except Exception as er:
             print(f'{er}')
 
-
-
+    def handle_convo_deleted(self,convo_id):
+        self.chat_messages.controls.clear()
+        self.load_conversation_messages()
+        self.page.update()
 
     def fetch_user_data(self): # Removed async
         try:
@@ -111,7 +113,7 @@ class HomeView(BaseView):
                 user_data = json.loads(user_session_str)
                 self.user_id = user_data.get("id")
                 self.user_email = user_data.get("email")
-                print(f"User ID: {self.user_id}, Email: {self.user_email}")
+                print(f"fetch_user_data - User ID: {self.user_id}, Email: {self.user_email}")
                 # You can fetch profile data here if needed
                 # try:
                 #     response = supabase.from_('profiles').select('*').eq('id', self.user_id).single().execute()
@@ -140,7 +142,7 @@ class HomeView(BaseView):
                 # print("Message saved:", response.data)
                 return response.data[0]
             else:
-                print("Error saving message:", response.error)
+                print("Error saving message:", response.error) # type: ignore
                 return None
         except Exception as e:
             print(f"Exception saving message: {e}")
@@ -168,7 +170,7 @@ class HomeView(BaseView):
                 self.chat_messages.controls.append(
                     self.messageBubble(
                         msg.get("content", ""),
-                        is_user=user,is_header=False
+                        is_user=user,is_header=False, apply_typewriter=False # No typewriter for loaded messages
                     )
                 )
 
@@ -190,17 +192,18 @@ class HomeView(BaseView):
             data = {
                 "sender": str(self.user_id)
             }
+            print(f"get_or_create_conversation - Attempting to insert new conversation with sender: {self.user_id}")
             response = supabase.table('conversations').insert(data).execute()  # Create a new conversation with user..........
             if response.data:
                 self.current_conversation_id = response.data[0]['id']
                 self.page.session.set("current_conversation_id",response.data[0]['id'])   # save new convo in session..............
-                print("New conversation created:", self.current_conversation_id)
+                print(f"get_or_create_conversation - New conversation created: {self.current_conversation_id}")
                 return self.current_conversation_id
             else:
-                print("Error creating conversation:", response.error)
+                print(f"get_or_create_conversation - Error creating conversation: {response.error}") # type: ignore
                 return None
         except Exception as e:
-            print(f"Exception creating conversation: {e}")
+            print(f"get_or_create_conversation - Exception creating conversation: {e}")
             return None
 
     def chat_with_ai_server(self, message):
@@ -212,13 +215,13 @@ class HomeView(BaseView):
             # print(response.json())
             return response.json().get("response", "Sorry, I couldn't process that.")
         
-        except requests.RequestException as e:
-            print(f"HTTP request failed: {e}")
-            return "Sorry, I couldn't connect to the internet."
-        
-        except requests.HTTPError as e:
+        except requests.HTTPError as e: # Catch specific HTTP errors first
             print(f"HTTP status error: {response.status_code} - {response.text}")
             return f"AI server error: {response.status_code}"
+
+        except requests.RequestException as e: # Catch general request exceptions
+            print(f"HTTP request failed: {e}")
+            return "Sorry, I couldn't connect to the internet."
         
         except Exception as e:
             print(f"An unexpected error occurred during AI chat: {e}")
@@ -241,7 +244,6 @@ class HomeView(BaseView):
                                             ))
                           ),
             center_title=False,
-            bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_TERTIARY_CONTAINER),
             actions=[
                 ft.Container(
                     margin=ft.margin.only(right=10),
@@ -259,7 +261,7 @@ class HomeView(BaseView):
             spacing=5,
             padding=ft.padding.all(5),
             controls=[
-                self.messageBubble('Hi there, what can i help you with today',is_header=True,is_user=False)
+                self.messageBubble('Hi there, what can i help you with today',is_header=True,is_user=False, apply_typewriter=False) # Initial message
             ]
         )
 
@@ -318,14 +320,28 @@ class HomeView(BaseView):
 
     def send_message(self, e):
         e.control.disable = True
-        message_text = self.message_text_field.value.strip()
+        message_text = (self.message_text_field.value or "").strip()
         self.message_text_field.value = "" # Clear input immediately
         self.page.update()
 
         if not message_text:
             e.control.disable = False
             return
-
+        
+        # Get or create conversation
+        if not self.current_conversation_id:
+            self.fetch_user_data() # Ensure user_id is set
+            if not self.user_id:
+                print("User not authenticated, cannot create conversation.")
+                e.control.disable = False
+                return
+            self.current_conversation_id = self.get_or_create_conversation()
+            self.load_conversation_messages()
+            if not self.current_conversation_id:
+                print("Failed to get or create conversation.")
+                e.control.disable = False
+                return
+            
         # Display user message
         self.chat_messages.controls.append(
             self.messageBubble(message_text, is_user=True,is_header=False)
@@ -335,37 +351,25 @@ class HomeView(BaseView):
             ft.Container(
                 content=ft.Row(
                     [
-                        ft.ProgressRing()
+                        ft.ProgressRing(),ft.Text('Zylla is thinking',size=12)
                     ],alignment=ft.MainAxisAlignment.START
                 )
             )
         )
         self.page.update()
-
-        # Get or create conversation
-        if not self.current_conversation_id:
-            self.fetch_user_data() # Ensure user_id is set
-            if not self.user_id:
-                print("User not authenticated, cannot create conversation.")
-                e.control.disable = False
-                return
-            self.current_conversation_id = self.get_or_create_conversation
-            if not self.current_conversation_id:
-                print("Failed to get or create conversation.")
-                e.control.disable = False
-                return
-
         # Save user message to Supabase
         self.save_message(self.current_conversation_id, self.user_id, message_text)
+        
         
         # Get AI response
         ai_response = self.chat_with_ai_server(message_text)
 
-        
+        # Remove the loadingRing....
         self.chat_messages.controls.pop()
+        
         # Display AI response
         self.chat_messages.controls.append(
-            self.messageBubble(ai_response, is_user=False,is_header=False)
+            self.messageBubble(ai_response, is_user=False,is_header=False, apply_typewriter=True) # Apply typewriter for new AI response
         )
         e.control.disable = False
         self.page.update()

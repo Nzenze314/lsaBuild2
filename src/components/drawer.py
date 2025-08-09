@@ -13,43 +13,55 @@ class SideBar(ft.NavigationDrawer):
             return dt.strftime("%m/%d/%Y, %I:%M %p")  # Adjust format as needed
     
     def select_conversation(self, convo_id):
-        self.page.session.set("current_conversation_id", convo_id)
-        if self.on_convo_selected:
-            self.on_convo_selected(convo_id)
+        if self.page: # Ensure page exists
+            self.page.session.set("current_conversation_id", convo_id)
+            if self.on_convo_selected:
+                self.on_convo_selected(convo_id)
+            self.page.close(self) # Close drawer after selection
+            self.page.update() # Update page after session change
 
     def startNewChat(self,e):
-        try:
-            data = {
-                "sender": str(self.user_id)
-            }
-            print("Starting a new chat")
-            conviId = createNewChat(self.page,data)
-            self.select_conversation(conviId)
-            self.update_convos(e)
+        if self.page: # Ensure page exists
             self.page.close(self)
-            self.page.update()
-        except Exception as er:
-            return
+            try:
+                data = {
+                    "sender": str(self.user_id)
+                }
+                print("Starting a new chat")
+                conviId = createNewChat(self.page,data)
+                if conviId:
+                    self.update_convos(e)
+                    print('Updated conversations.')
+                    self.page.update()  
+            except Exception as er:
+                print(er)
+                return er
         
 
     def deleteConvo(self,e):
         print("Deleting conversation...")
-        self.page.close(self)
+        
+        if self.page: # Ensure page exists
+            print(self.page.controls)
+            self.page.close(self)
         id = e.control.data
         if deleteChat(id):
             self.update_convos(e)
-            self.page.update()      
+            if self.on_convo_deleted:
+                self.on_convo_deleted(id)
+            if self.page: # Ensure page exists
+                self.page.update()      
         else:
-            print("Deleting conversation...")
-            self.page.close(self)
+            print("Deleting conversation failed.")
+            if self.page: # Ensure page exists
+                self.page.close(self)
 
-          
-
-    def __init__(self, page: ft.Page, on_convo_selected=None):
+    def __init__(self, page: ft.Page, on_convo_selected=None,on_convo_deleted=None):
         super().__init__()
         self.page = page
         self.font = "Bungee-Regular"
         self.on_convo_selected = on_convo_selected
+        self.on_convo_deleted = on_convo_deleted
 
         user_session_str = self.page.session.get("user")
         if user_session_str:
@@ -58,14 +70,12 @@ class SideBar(ft.NavigationDrawer):
             self.user_email = user_data.get("email")
         convos = getConvos( self.user_id)
         
-
         # print(convos)
         if len(convos) > 0:
-            self.page.session.set("current_conversation_id",convos[0]["id"])
-        else:
-            createNewChat(page,{"sender":self.user_id})
-             
-
+            if self.page: # Ensure page exists
+                self.page.session.set("current_conversation_id",convos[0]["id"])
+        # Removed createNewChat(page,{"sender":self.user_id}) as it's handled in HomeView
+            
         self.convos_list = ft.Column(
             [
                 ft.Container(
@@ -86,7 +96,7 @@ class SideBar(ft.NavigationDrawer):
                     on_click=lambda e: self.select_conversation(e.control.data),
                 )
                 for conv in convos
-            ],horizontal_alignment=ft.CrossAxisAlignment.STRETCH, height=self.page.height * 0.4,
+            ],horizontal_alignment=ft.CrossAxisAlignment.STRETCH, expand=True,
             scroll=ft.ScrollMode.AUTO
         )            
 
@@ -103,7 +113,7 @@ class SideBar(ft.NavigationDrawer):
                         ft.IconButton(
                             ft.Icons.CLOSE,icon_color='white',
                             tooltip="Close",
-                            on_click=lambda e: self.page.close(self),
+                            on_click=lambda e: self.page.close(self) if self.page else None, # Ensure page exists
                         )
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -148,7 +158,7 @@ class SideBar(ft.NavigationDrawer):
             ft.ListTile(
                 leading=ft.Icon(ft.Icons.PERSON, color=ft.Colors.WHITE),
                 title=ft.Text("Manage Profile", color=ft.Colors.WHITE),
-                on_click=lambda e: self.page.go("/profile"),
+                on_click=lambda e: self.page.go("/profile") if self.page else None, # Ensure page exists
             ),
             ft.ListTile(
                 leading=ft.Icon(ft.Icons.LOGOUT, color=ft.Colors.WHITE),
@@ -160,7 +170,8 @@ class SideBar(ft.NavigationDrawer):
 
     def logout(self, e):
         logout(self,e)
-        self.page.update()
+        if self.page: # Ensure page exists
+            self.page.update()
 
     def update_convos(self,e):
         try:
@@ -169,6 +180,8 @@ class SideBar(ft.NavigationDrawer):
             convos = getConvos(self.user_id)
             
             if len(convos) > 0:
+                if self.page: # Ensure page exists
+                    self.page.session.set("current_conversation_id",convos[0]["id"])
                 self.convos_list.controls.extend([
                     ft.Container(
                         content=ft.Row(
@@ -190,7 +203,8 @@ class SideBar(ft.NavigationDrawer):
                     for conv in convos
                 ])
             
-            self.page.update()
+            if self.page: # Ensure page exists
+                self.page.update()
         except Exception as er:
                 print(f'{er}')
                 return

@@ -48,7 +48,7 @@ class OnboardingView(BaseView):
         self.image.src = self.images[self.index]
 
         for i, dot in enumerate(self.dots.controls):
-            dot.bgcolor = ft.Colors.PRIMARY if i == self.index else ft.Colors.GREY_300
+            dot.bgcolor = ft.Colors.PRIMARY if i == self.index else ft.Colors.GREY_300 # type: ignore
 
         self.page.update()
 
@@ -73,25 +73,27 @@ class OnboardingView(BaseView):
         return ft.View(
             route="/onboarding",
             controls=[
-                ft.Container(
-                    content=ft.Column(
-                        [
-                            self.title_text,
-                            self.image,
-                            self.subtitle_text,
-                            self.dots,
-                            ft.Row(
-                                [
-                                    ft.TextButton("Back", on_click=self._back),
-                                    ft.TextButton("Skip", on_click=self._skip),
-                                    ft.FilledButton("Next", on_click=self._next),
-                                ],
-                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                            ),
-                        ],
-                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN, 
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        expand=True
+                ft.SafeArea(
+                    content = ft.Container(
+                        content=ft.Column(
+                            [
+                                self.title_text,
+                                self.image,
+                                self.subtitle_text,
+                                self.dots,
+                                ft.Row(
+                                    [
+                                        ft.TextButton("Back", on_click=self._back),
+                                        ft.TextButton("Skip", on_click=self._skip),
+                                        ft.FilledButton("Next", on_click=self._next),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                                ),
+                            ],
+                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN, 
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                            expand=True
+                        ),expand=True
                     ),expand=True
                 )
             ],vertical_alignment=ft.MainAxisAlignment.SPACE_EVENLY

@@ -52,7 +52,7 @@ class LeaveReviewCard(ft.Container):
                     ft.Container(height=12),
                     self.submit_button
                 ],
-                spacing=3
+                spacing=3,horizontal_alignment=ft.CrossAxisAlignment.CENTER
             ),padding=ft.padding.symmetric(horizontal=10)
         )
 
@@ -87,20 +87,25 @@ class LeaveReviewCard(ft.Container):
         review_text = self.review_input.value
         if not review_text:
             alert = AlertBox("Please enter a review and rating")
-            self.page.open(
-                 alert
-            )
+            if self.page: # Ensure page exists
+                self.page.open(
+                    alert
+                )
             return
         elif self.selected_rating == 0:
             alert = AlertBox("Please enter a review and rating")
-            self.page.open(
-                 alert
-            )
+            if self.page: # Ensure page exists
+                self.page.open(
+                    alert
+                )
             return
         
         try:
             # Get user_id from session
-            session_user = self.page.session.get("user")
+            session_user = None
+            if self.page: # Ensure page exists before accessing session
+                session_user = self.page.session.get("user")
+
             if session_user:
                 user_data = json.loads(session_user)
                 user_id = user_data.get("id")
@@ -115,21 +120,22 @@ class LeaveReviewCard(ft.Container):
                 "rating": self.selected_rating
             }
             alert = AlertBox("Submitted Feedback!")
-            self.page.open(
-                 alert
-            )
+            if self.page: # Ensure page exists
+                self.page.open(
+                    alert
+                )
             response = submitReview(data)
             
-            if response.data:
+            if response and response.data: # Ensure response is not None and has data
                 print("Review submitted successfully.")
-                self.page.close(alert)
+                if self.page: # Ensure page exists
+                    self.page.close(alert)
                 self.review_input.value = ""
                 self.handle_star_click(e,reset=True)
                 self.selected_rating = 0
                 self.create_stars()  # Reset stars
                 self.update()
             else:
-                print(f"Error submitting review: {response.error}")
+                print(f"Error submitting review: {response.error if response else 'No response or data'}") # type: ignore
         except Exception as err:
             print(f"Unexpected error: {err}")
-

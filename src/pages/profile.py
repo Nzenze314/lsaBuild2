@@ -9,14 +9,21 @@ class ProfileView(BaseView):
         super().__init__(page)
         uuid = self.page.session.get("userId")
         self.profileData = self.page.session.get("userProfile")
+        self.font = "Bungee-Regular"
         
     def build(self): 
         appbar = ft.AppBar(
-            title=ft.Text("Profile", size=20, weight=ft.FontWeight.BOLD),
+            title=ft.Text("Profile", font_family=self.font,
+                          weight=ft.FontWeight.W_100, size=20,color=ft.Colors.with_opacity(0.5,ft.Colors.PRIMARY),
+                          style=ft.TextStyle(shadow=ft.BoxShadow(spread_radius=1,
+                            blur_radius=2,color="white",
+                            offset=ft.Offset(0, 0.4),
+                            blur_style=ft.ShadowBlurStyle.OUTER,
+                        ))),
 
         )
-        username = self.profileData['username']
-        useremail = self.profileData['email']
+        username = self.profileData.get('username', '') if self.profileData else ''
+        useremail = self.profileData.get('email', '') if self.profileData else ''
 
         return ft.View(
             route="/profile",
@@ -55,6 +62,12 @@ class ProfileView(BaseView):
                             bgcolor=ft.Colors.GREY_100,
                         ),
                         LeaveReviewCard(),
+                        ft.ListTile(
+                            leading=ft.Icon(ft.Icons.INFO),
+                            title=ft.Text("About App"),
+                            on_click=lambda _: self.page.go("/about"),
+                            bgcolor=ft.Colors.GREY_100,
+                        ), 
                         ft.ListTile(
                             leading=ft.Icon(ft.Icons.LOGOUT, color=ft.Colors.RED),
                             title=ft.Text("Sign-out", color=ft.Colors.RED),
