@@ -1,6 +1,7 @@
 # pages/profile.py
 from components.base_view import BaseView
 from components.reviewCard import LeaveReviewCard
+from components.alert import AlertBox
 from components.authFunctions import logout
 import flet as ft
 
@@ -61,7 +62,18 @@ class ProfileView(BaseView):
                             subtitle=ft.Text("Landmark"),
                             bgcolor=ft.Colors.GREY_100,
                         ),
-                        LeaveReviewCard(),
+                        ft.ListTile(
+                            leading=ft.Icon(ft.Icons.LOCK),
+                            title=ft.Text("Change Password"),
+                            on_click=lambda _: self.page.open(AlertBox('Feature not yet implement!!')),
+                            bgcolor=ft.Colors.GREY_100,
+                        ),
+                        ft.ListTile(
+                            leading=ft.Icon(ft.Icons.STAR),
+                            title=ft.Text('Rate this app'),
+                            on_click=lambda _: self.page.open(LeaveReviewCard(self.page)),
+                            bgcolor=ft.Colors.GREY_100
+                        ),
                         ft.ListTile(
                             leading=ft.Icon(ft.Icons.INFO),
                             title=ft.Text("About App"),

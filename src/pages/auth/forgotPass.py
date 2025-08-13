@@ -38,7 +38,16 @@ class ForgotPasswordView(BaseView):
             padding=0,
             controls=[
                 ft.Stack([
-                    ft.Image(src="/images/bgSup2.jpg", fit=ft.ImageFit.COVER, expand=True),
+                    ft.Container(
+                                width=self.page.window.width,
+                                height=self.page.window.height,
+                                expand=1,
+                                gradient=ft.LinearGradient(
+                                    begin=ft.alignment.top_center,
+                                    end=ft.alignment.bottom_center,
+                                    colors=[ft.Colors.PURPLE_200, ft.Colors.BLACK, ft.Colors.BLACK, ft.Colors.PURPLE_200],
+                                ),
+                            ),
                     ft.Container(
                         expand=True,
                         content=ft.Column(
@@ -48,7 +57,7 @@ class ForgotPasswordView(BaseView):
                                 ft.Container(
                                     padding=ft.padding.symmetric(horizontal=20, vertical=30),
                                     border_radius=ft.border_radius.all(30),
-                                    bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.PURPLE_800),
+                                    bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.PURPLE_800),
                                     blur=12,
                                     content=ft.Column(
                                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,

@@ -22,5 +22,5 @@ def AlertBox(content):
                     title = ft.Text("Alert", weight=ft.FontWeight.BOLD),
                     content=ft.Text(content),
                     shape=ft.RoundedRectangleBorder(radius=10),
-
+                    
                  )

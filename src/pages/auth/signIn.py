@@ -65,12 +65,15 @@ class SignInView(BaseView):
                 ft.SafeArea(
                     content = ft.Stack(
                         [
-                            ft.Image(
+                            ft.Container(
                                 width=self.page.window.width,
-                                height= self.page.window.height,
-                                fit=ft.ImageFit.COVER,
-                                src="/images/bgSup2.jpg",
-                                expand=1
+                                height=self.page.window.height,
+                                expand=1,
+                                gradient=ft.LinearGradient(
+                                    begin=ft.alignment.top_center,
+                                    end=ft.alignment.bottom_center,
+                                    colors=[ft.Colors.PURPLE_200, ft.Colors.BLACK, ft.Colors.BLACK, ft.Colors.PURPLE_200],
+                                ),
                             ),
                             ft.Container(
                                 expand=True,
@@ -85,7 +88,7 @@ class SignInView(BaseView):
                                             expand=5,
                                             padding=ft.padding.symmetric(horizontal=19, vertical=20),
                                             border_radius=ft.border_radius.only(top_left=30, top_right=30),
-                                            bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.PURPLE_800),
+                                            bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.PURPLE_800),
                                             blur=12,
                                             content=ft.Column(
                                                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -102,7 +105,7 @@ class SignInView(BaseView):
                                                     self.signInBtn,
                                                     self.loading_indicator,
                                                     ft.Divider(),
-                                                    ft.TextButton("Don't have an account? Sign Up", on_click=lambda _: self.page.go("/signup"))
+                                                    ft.TextButton("Don't have an account? Sign Up", on_click=lambda _: self.page.go("/signup"), style=ft.ButtonStyle(color=ft.Colors.PRIMARY))
                                                 ],expand=True,scroll=ft.ScrollMode.AUTO,
                                                 alignment=ft.MainAxisAlignment.SPACE_EVENLY,
                                             )
@@ -156,5 +159,3 @@ class SignInView(BaseView):
             self.error_message_text_ref.current.value = f"Sign-in failed: {error}"
             self.bs.open = True
             self.page.update()
-
-    

@@ -3,14 +3,13 @@ import flet as ft
 from components.authFunctions import submitReview
 from components.alert import AlertBox
 
-class LeaveReviewCard(ft.Container):
-    def __init__(self, on_submit=None):
-        super().__init__()
-
+class LeaveReviewCard(ft.AlertDialog):
+    def __init__(self, page, on_submit=None):
         self.on_submit = on_submit
         self.selected_rating = 0
         self.stars = []
-        self.alert_box = AlertBox(self.page)
+        self.alert_box = AlertBox(page)
+        self.page = page # Store the page reference
 
         self.review_input = ft.TextField(
             hint_text="Share your thoughts...",
@@ -20,8 +19,7 @@ class LeaveReviewCard(ft.Container):
             border_radius=8,
             filled=True,
             fill_color=ft.Colors.GREY_100,
-            border_color=ft.Colors.GREY_300,
-            expand=True,
+            border_color=ft.Colors.GREY_300
         )
 
         self.submit_button = ft.ElevatedButton(
@@ -42,25 +40,26 @@ class LeaveReviewCard(ft.Container):
             spacing=4
         )
 
-        self.content = ft.Container(
-            content=ft.Column(
-                controls=[
-                    ft.Text("Leave a Review", size=20, weight=ft.FontWeight.BOLD),
-                    ft.Divider(),
-                    self.star_row,
-                    self.review_input,
-                    ft.Container(height=12),
-                    self.submit_button
-                ],
+        super().__init__(
+            modal=False,
+            title=ft.Text("Leave a Review", size=20, weight=ft.FontWeight.BOLD),
+            content=ft.Container(
+                content=ft.Column(
+                    controls=[
+                        
+                        ft.Divider(),
+                        self.star_row,
+                        self.review_input,
+                        ft.Container(height=12),
+                        self.submit_button
+                    ],
                 spacing=3,horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            ),padding=ft.padding.symmetric(horizontal=10)
+                ),height=200,
+            ),
+            content_padding=ft.padding.symmetric(horizontal=10),
+            shape=ft.RoundedRectangleBorder(radius=12),
+            bgcolor=ft.Colors.WHITE,
         )
-
-        self.padding = 16
-        self.margin = ft.margin.symmetric(horizontal=10)
-        self.border_radius = 12
-        self.bgcolor = ft.Colors.WHITE
-        self.shadow = ft.BoxShadow(blur_radius=8, color=ft.Colors.with_opacity(0.2, ft.Colors.BLACK), offset=ft.Offset(2, 2))
 
     def create_stars(self):
         self.stars.clear()

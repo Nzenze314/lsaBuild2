@@ -119,13 +119,14 @@ class Router:
 
         return stack
 
-# Main App
+# Main App  
 class MyApp:
     def __init__(self, page: ft.Page):
         self.page = page
-        self.page.theme_mode = ft.ThemeMode.LIGHT
-        self.router = Router(page)
-        self.view_stack = []
+        self.page.theme_mode = ft.ThemeMode.LIGHT                        
+        self.router = Router(page)           
+        self.page.adaptive = True 
+        self.view_stack = []     
         self.ai_server = "https://zylla.onrender.com"
         "Mg8CgSgpU7Ep2Gi"
 

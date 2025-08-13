@@ -59,7 +59,16 @@ class SignUpView(BaseView):
                 ft.SafeArea(
                     content=ft.Stack(
                         [
-                        ft.Image(src="/images/bgSup2.jpg", fit=ft.ImageFit.COVER, expand=2, width=self.page.window.width,),
+                        ft.Container(
+                                width=self.page.window.width,
+                                height=self.page.window.height,
+                                expand=1,
+                                gradient=ft.LinearGradient(
+                                    begin=ft.alignment.top_center,
+                                    end=ft.alignment.bottom_center,
+                                    colors=[ft.Colors.PURPLE_200, ft.Colors.BLACK, ft.Colors.BLACK, ft.Colors.PURPLE_200],
+                                ),
+                            ),
                         ft.Container(
                             expand=True,
                             content=ft.Column(
@@ -75,17 +84,17 @@ class SignUpView(BaseView):
                                         expand=8,
                                         padding=ft.padding.symmetric(horizontal=19, vertical=20),
                                         border_radius=ft.border_radius.only(top_left=30, top_right=30),
-                                        bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.PURPLE_800),
+                                        bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.PURPLE_800),
                                         blur=18,
                                         content=ft.Column(
                                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                             alignment=ft.MainAxisAlignment.SPACE_EVENLY,
-                                            spacing=5,
+                                            spacing=10,
                                             controls=[
                                                 ft.Text("Create Account", size=28, weight=ft.FontWeight.BOLD, color=ft.Colors.PRIMARY),
                                                 ft.Text("Fill in your details", size=19, color=ft.Colors.WHITE),
                                                 self.name_field,self.email_field, self.password_field, self.confirm_password_field,
-                                                ft.Container(height=10),
+                                                ft.Container(height=5),
                                                 ft.ElevatedButton("Sign Up", on_click=self.handle_sign_up, width=300 ,),
                                                 self.loading_indicator,
                                                 ft.Divider(),
