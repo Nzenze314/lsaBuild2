@@ -41,7 +41,8 @@ class ProfileView(BaseView):
                         ft.Text(str(username), size=22, weight=ft.FontWeight.BOLD),
                         ft.Divider(height=10),
                         ft.ElevatedButton(
-                            text="Edit Profile", icon=ft.Icons.EDIT, bgcolor=ft.Colors.WHITE
+                            text="Edit Profile", icon=ft.Icons.EDIT, bgcolor=ft.Colors.WHITE,
+                            on_click=lambda e: self.page.open(AlertBox('Feature not yet implement!!'))
                         ),
                         ft.Container(height=5),
                         ft.ListTile(
