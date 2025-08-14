@@ -53,7 +53,7 @@ class HomeView(BaseView):
                                                                blur_radius=6, color=ft.Colors.WHITE,
                                                                offset=ft.Offset(0, 0), blur_style=ft.ShadowBlurStyle.OUTER)))
                 else:
-                    text_control = ft.Markdown(value=text, extension_set=ft.MarkdownExtensionSet.GITHUB_WEB, on_tap_link=lambda e: print(f"Link tapped: {e.data}"))
+                    text_control = ft.Markdown(selectable=True,value=text, extension_set=ft.MarkdownExtensionSet.GITHUB_WEB, on_tap_link=lambda e: print(f"Link tapped: {e.data}"))
 
                 return ft.Container(
                     content=ft.Column(
@@ -71,7 +71,7 @@ class HomeView(BaseView):
                             ft.Container(
                                 ft.Column(
                                     [
-                                        ft.Text(text, size=15, color=ft.Colors.GREY_800,expand=7,text_align=ft.TextAlign.RIGHT,),
+                                        ft.Text(text,selectable=True, size=15, color=ft.Colors.GREY_800,expand=7,text_align=ft.TextAlign.RIGHT,),
                                         ft.Text(currentTime, size=7, color=ft.Colors.GREY_500,expand=1)
                                     ],horizontal_alignment=ft.CrossAxisAlignment.END,
                                 ),alignment=ft.alignment.bottom_right,bgcolor=ft.Colors.ON_SECONDARY_CONTAINER,

@@ -156,7 +156,7 @@ class MyApp:
     
         self.page.fonts = {
             "Grand Hotel": "/fonts/GrandHotel-Regular.ttf",
-            "Bungee-Regular": "/fonts/Bungee-Regular.ttf",
+            "Bungee-Regular": "/fonts/Bungee-Regular.ttf", 
         }   
         onboardingCompleted = self.page.client_storage.get("onboarding_completed") 
 
